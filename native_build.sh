@@ -17,9 +17,9 @@ if [[ ! -f "${jar}" ]]; then
   mvn clean verify -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dmaven.source.skip=true -pl core -am || die "cannot build ${jar}"
 fi
 
-find ./core -type f -name \*.java >> all.txt
+find ./core/src/main/java -type f -name \*.java >> all-java.txt
 mkdir -p core/src/main/resources/META-INF/native-image
-rm -f core/src/main/resources/META-INF/native-image/*
+
 "${GRAALVM_HOME}"/bin/java \
   --add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED \
   --add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED \
@@ -32,7 +32,7 @@ rm -f core/src/main/resources/META-INF/native-image/*
   --add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED \
   --add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED \
   -agentlib:native-image-agent=config-output-dir=core/src/main/resources/META-INF/native-image \
-  -jar "${jar}" --dry-run @all.txt
+  -jar "${jar}" --dry-run @all-java.txt
 
 # -H:IncludeResourceBundles=com.sun.tools.javac.resources.javac \
 #-H:ConfigurationResourceRoots=META-INF/native-image \
@@ -64,5 +64,8 @@ echo "building native image from ${jar}..."
   --allow-incomplete-classpath \
   -cp "${jar}" \
   --no-fallback
+
+rm -f all-java.txt
+rm -rf core/src/main/resources/META-INF/native-image/
 
 echo "done"
