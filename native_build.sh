@@ -32,13 +32,14 @@ rm -f core/src/main/resources/META-INF/native-image/*
   --add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED \
   --add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED \
   -agentlib:native-image-agent=config-output-dir=core/src/main/resources/META-INF/native-image \
-  -jar core/target/google-java-format-HEAD-SNAPSHOT-all-deps.jar --dry-run @all.txt
+  -jar "${jar}" --dry-run @all.txt
 
 # -H:IncludeResourceBundles=com.sun.tools.javac.resources.javac \
 #-H:ConfigurationResourceRoots=META-INF/native-image \
 # --initialize-at-build-time \
 # --no-server
 # -H:-CheckToolchain \
+# --no-server
 echo "building native image from ${jar}..."
 
 "${GRAALVM_HOME}"/bin/native-image \
@@ -62,7 +63,6 @@ echo "building native image from ${jar}..."
   -Djava.home="${GRAALVM_HOME}" \
   --allow-incomplete-classpath \
   -cp "${jar}" \
-  --no-fallback \
-  --no-server
+  --no-fallback
 
 echo "done"
