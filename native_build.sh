@@ -9,7 +9,7 @@ version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
 jar="core/target/google-java-format-${version}-all-deps.jar"
 
 if [ -z "${GRAALVM_HOME}" ]; then
-  export GRAALVM_HOME=/Users/wangxufire/workspace/graalvm-ce-java16-21.3.0-dev/Contents/Home
+  export GRAALVM_HOME=/Users/wangxufire/workspace/graalvm-ce-java17-21.3.0-dev/Contents/Home
 fi
 
 if [[ ! -f "${jar}" ]]; then
@@ -34,12 +34,14 @@ mkdir -p core/src/main/resources/META-INF/native-image
   -agentlib:native-image-agent=config-output-dir=core/src/main/resources/META-INF/native-image \
   -jar "${jar}" --dry-run @all-java.txt
 
-# -H:IncludeResourceBundles=com.sun.tools.javac.resources.javac \
-#-H:ConfigurationResourceRoots=META-INF/native-image \
-# --initialize-at-build-time \
 # --no-server
 # -H:-CheckToolchain \
 # --no-server
+# -H:+IncludeAllLocales \
+# --initialize-at-build-time \
+# -Dgraal.EnterprisePartialUnroll=true \
+# -H:ConfigurationResourceRoots=META-INF/native-image \
+# --initialize-at-build-time=com.google.googlejavaformat \
 echo "building native image from ${jar}..."
 
 "${GRAALVM_HOME}"/bin/native-image \
@@ -56,8 +58,9 @@ echo "building native image from ${jar}..."
   -H:+ReportExceptionStackTraces \
   -H:+ReportUnsupportedElementsAtRuntime \
   -H:ConfigurationFileDirectories=./core/src/main/resources/META-INF/native-image \
-  -H:IncludeLocales=zh-CN,en_US \
+  -H:DefaultLocale=zh_CN \
   -H:IncludeResourceBundles=com.sun.tools.javac.resources.compiler \
+  -H:IncludeResourceBundles=com.sun.tools.javac.resources.javac \
   -H:Class=com.google.googlejavaformat.java.Main \
   -H:Name="google-java-format-graal" \
   -Djava.home="${GRAALVM_HOME}" \

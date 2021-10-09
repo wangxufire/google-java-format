@@ -1,0 +1,3 @@
+[EXECUTABLE]
+google-java-format-graal
+
