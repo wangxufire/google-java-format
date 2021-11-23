@@ -33,7 +33,7 @@ import string
 import subprocess
 import io
 import sys
-from distutils.spawn import find_executable
+from shutil import which
 
 def main():
   parser = argparse.ArgumentParser(description=
@@ -105,7 +105,7 @@ def main():
   elif args.google_java_format_jar:
     base_command = ['java', '-jar', args.google_java_format_jar]
   else:
-    binary = find_executable('google-java-format') or '/usr/bin/google-java-format'
+    binary = which('google-java-format') or '/usr/bin/google-java-format'
     base_command = [binary]
 
   # Reformat files containing changes in place.
@@ -134,11 +134,11 @@ def main():
     if not args.i:
       with open(filename) as f:
         code = f.readlines()
-      formatted_code = io.StringIO(stdout).readlines()
+      formatted_code = io.StringIO(stdout.decode('utf-8')).readlines()
       diff = difflib.unified_diff(code, formatted_code,
                                   filename, filename,
                                   '(before formatting)', '(after formatting)')
-      diff_string = string.join(diff, '')
+      diff_string = ''.join(diff)
       if len(diff_string) > 0:
         sys.stdout.write(diff_string)
 
