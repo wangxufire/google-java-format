@@ -1689,7 +1689,8 @@ class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
    * }</pre>
    */
   private boolean handleLogStatement(MethodInvocationTree node) {
-    if (!getMethodName(node).contentEquals("log")) {
+    Name methodName = getMethodName(node);
+    if (!methodName.contentEquals("log") && !methodName.contentEquals("logVarargs")) {
       return false;
     }
     Deque<ExpressionTree> parts = new ArrayDeque<>();
