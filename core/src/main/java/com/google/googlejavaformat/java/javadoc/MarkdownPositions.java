@@ -36,14 +36,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.commonmark.ext.gfm.tables.TableBlock;
 import org.commonmark.ext.gfm.tables.TablesExtension;
+import org.commonmark.node.BlockQuote;
 import org.commonmark.node.BulletList;
 import org.commonmark.node.Code;
 import org.commonmark.node.FencedCodeBlock;
 import org.commonmark.node.Heading;
+import org.commonmark.node.IndentedCodeBlock;
+import org.commonmark.node.LinkReferenceDefinition;
 import org.commonmark.node.ListItem;
 import org.commonmark.node.Node;
 import org.commonmark.node.OrderedList;
 import org.commonmark.node.Paragraph;
+import org.commonmark.node.ThematicBreak;
 import org.commonmark.parser.IncludeSourceSpans;
 import org.commonmark.parser.Parser;
 
@@ -90,7 +94,7 @@ final class MarkdownPositions {
     void visit(Node node) {
       boolean alreadyVisitedChildren = false;
       switch (node) {
-        case Heading heading -> addSpan(heading, HEADER_OPEN_TOKEN, HEADER_CLOSE_TOKEN);
+        case Heading heading -> visitHeading(heading);
         case Paragraph paragraph -> addSpan(paragraph, PARAGRAPH_OPEN_TOKEN, PARAGRAPH_CLOSE_TOKEN);
         case BulletList bulletList -> addSpan(bulletList, LIST_OPEN_TOKEN, LIST_CLOSE_TOKEN);
         case OrderedList orderedList -> addSpan(orderedList, LIST_OPEN_TOKEN, LIST_CLOSE_TOKEN);
@@ -101,6 +105,14 @@ final class MarkdownPositions {
           alreadyVisitedChildren = true;
         }
         case Code code -> visitCodeSpan(code);
+        case BlockQuote blockQuote ->
+            throw new UnsupportedOperationException("Block quotes not supported");
+        case IndentedCodeBlock indentedCodeBlock ->
+            throw new UnsupportedOperationException("Indented code blocks not supported");
+        case ThematicBreak thematicBreak ->
+            throw new UnsupportedOperationException("Thematic breaks not supported");
+        case LinkReferenceDefinition linkReferenceDefinition ->
+            throw new UnsupportedOperationException("Link reference definitions not supported");
         // TODO: others
         default -> {}
       }
@@ -128,6 +140,19 @@ final class MarkdownPositions {
         }
         default -> false;
       };
+    }
+
+    private void visitHeading(Heading heading) {
+      // There are two ways to spell a heading in Markdown:
+      // 1. With hashes: `# Heading` `## Subheading`
+      // 2. With dashes or underlines: `Heading\n=======` `Subheading\n-------`
+      // We currently only support the first kind. We can distinguish the two cases by checking if
+      // the heading text contains a newline.
+      String s = nodeString(heading);
+      if (s.contains("\n")) {
+        throw new UnsupportedOperationException("Unsupported heading: " + s);
+      }
+      addSpan(heading, HEADER_OPEN_TOKEN, HEADER_CLOSE_TOKEN);
     }
 
     private void visitFencedCodeBlock(FencedCodeBlock fencedCodeBlock) {
@@ -204,6 +229,10 @@ final class MarkdownPositions {
     private int endPosition(Node node) {
       var last = node.getSourceSpans().getLast();
       return last.getInputIndex() + last.getLength();
+    }
+
+    private String nodeString(Node node) {
+      return input.substring(startPosition(node), endPosition(node));
     }
   }
 

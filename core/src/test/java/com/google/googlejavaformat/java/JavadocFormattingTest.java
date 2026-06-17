@@ -1860,17 +1860,14 @@ class Test {}
         /// foo
         /// ***
         /// bar
-        class Test {}
-        """;
-    // TODO: the line break before `***` should be preserved.
-    // It's OK to introduce a blank line before `bar` since it is a new paragraph.
-    String expected =
-        """
-        /// foo ***
+        /// baz
         ///
-        /// bar
+        ///
         class Test {}
         """;
+    // TODO: thematic breaks are not supported. That means the input is unchanged. We can see this
+    // because the blank lines at the end are preserved.
+    String expected = input;
     doFormatTest(input, expected);
   }
 
@@ -1883,21 +1880,14 @@ class Test {}
         /// =======
         /// Phoebe B. Peabody-Beebe
         ///
+        ///
         /// Subheading
         /// ----------
         class Test {}
         """;
-    // TODO: the line breaks before the lines of repeated characters should be preserved.
-    //    Or, we could rewrite this style of heading as `# Heading`.
-    String expected =
-        """
-        /// Heading =======
-        ///
-        /// Phoebe B. Peabody-Beebe
-        ///
-        /// Subheading ----------
-        class Test {}
-        """;
+    // TODO: This kind of heading is not supported. That means the input is unchanged.
+    // We can see this because the extra blank line is preserved.
+    String expected = input;
     doFormatTest(input, expected);
   }
 
@@ -1908,14 +1898,14 @@ class Test {}
         """
         ///     code block
         ///     is indented
+        /// text after code block
+        ///
+        ///
         class Test {}
         """;
-    // TODO: the evil indented code block should be preserved.
-    String expected =
-        """
-        /// code block is indented
-        class Test {}
-        """;
+    // TODO: evil indented code blocks like this are not supported. That means the input is
+    // unchanged. We can see this because the blank lines at the end are preserved.
+    String expected = input;
     doFormatTest(input, expected);
   }
 
@@ -1924,15 +1914,17 @@ class Test {}
     assume().that(MARKDOWN_JAVADOC_SUPPORTED).isTrue();
     String input =
         """
-        /// [foo]
+        /// [foo] [bar]
+        ///
         /// [foo]: /url "title"
+        /// [bar]: /url2 "title2"
+        ///
+        ///
         class Test {}
         """;
-    String expected =
-        """
-        /// [foo] [foo]: /url "title"
-        class Test {}
-        """;
+    // TODO: link reference definitions are not supported. That means the input is unchanged. We can
+    // see this because the blank lines at the end are preserved.
+    String expected = input;
     doFormatTest(input, expected);
   }
 
@@ -1965,16 +1957,13 @@ class Test {}
         """
         /// > foo
         /// > bar
-        class Test {}
-        """;
-    // TODO: the block quote should be preserved, and ideally bar would be joined to foo.
-    String expected =
-        """
-        /// >
         ///
-        /// foo > bar
+        ///
         class Test {}
         """;
+    // TODO: block quotes are not supported. That means the input is unchanged. We can see this
+    // because the extra blank lines at the end are preserved.
+    String expected = input;
     doFormatTest(input, expected);
   }
 
@@ -2014,10 +2003,11 @@ class Test {}
     assume().that(MARKDOWN_JAVADOC_SUPPORTED).isTrue();
     String input =
         """
-        /// <http://{@code example.com> <br> is not inside @code}.
+        /// <http://{@code:example.com> <br> is not inside @code}.
         class Test {}
         """;
     // TODO: the <br> should trigger a line break since it is not in fact inside {@code ...}.
+    // This is something of a corner case, though.
     String expected = input;
     doFormatTest(input, expected);
   }

@@ -83,7 +83,11 @@ final class JavadocLexer {
     } else {
       checkArgument(input.startsWith("///"));
       input = input.substring("///".length());
-      markdownPositions = MarkdownPositions.parse(input);
+      try {
+        markdownPositions = MarkdownPositions.parse(input);
+      } catch (UnsupportedOperationException e) {
+        throw new LexException(e);
+      }
     }
     return new JavadocLexer(new CharStream(input), markdownPositions, classicJavadoc)
         .generateTokens();
@@ -709,5 +713,11 @@ final class JavadocLexer {
     return compile(format("</(?:%s)\\b[^>]*>", namePattern), CASE_INSENSITIVE);
   }
 
-  static class LexException extends Exception {}
+  static class LexException extends Exception {
+    LexException() {}
+
+    LexException(Throwable cause) {
+      super(cause);
+    }
+  }
 }

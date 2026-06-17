@@ -87,12 +87,10 @@ public final class JavadocFormatter {
           default ->
               throw new IllegalArgumentException("Input does not start with /** or ///: " + input);
         };
-    if (!classicJavadoc) {
-      input = "///" + markdownCommentText(input);
-    }
+    String inputForLexer = classicJavadoc ? input : ("///" + markdownCommentText(input));
     ImmutableList<Token> tokens;
     try {
-      tokens = lex(input, classicJavadoc);
+      tokens = lex(inputForLexer, classicJavadoc);
     } catch (LexException e) {
       return input;
     }
