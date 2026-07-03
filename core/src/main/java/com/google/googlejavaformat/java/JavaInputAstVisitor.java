@@ -353,6 +353,7 @@ class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
   @Override
   public Void visitCompilationUnit(CompilationUnitTree node, Void unused) {
+    recordMarkdownJavadocPosition(node);
     boolean afterFirstToken = false;
     if (node.getPackageName() != null) {
       markForPartialFormat();
@@ -814,6 +815,7 @@ class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
   }
 
   private void visitEnumConstantDeclaration(VariableTree enumConstant) {
+    recordMarkdownJavadocPosition(enumConstant);
     for (AnnotationTree annotation : enumConstant.getModifiers().getAnnotations()) {
       scan(annotation, null);
       builder.forcedBreak();

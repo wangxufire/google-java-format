@@ -2092,12 +2092,11 @@ enum Foo {
   BAR,
 }
 """;
-    // TODO(b/530532338): The wrapped line should have /// not //
     String expected =
 """
 enum Foo {
   /// Long long long, longedy long, más fada an lá tig an oíche, chaise longue, caffè lungo, ich bin
-  // so lang nicht bei dir gewest
+  /// so lang nicht bei dir gewest
   BAR,
 }
 """;
@@ -2114,11 +2113,10 @@ enum Foo {
 /// Long long long, longedy long, más fada an lá tig an oíche, chaise longue, caffè lungo, ich bin so lang nicht bei dir gewest
 package com.example;
 """;
-    // TODO(b/530532338): The wrapped line should have /// not //
     String expected =
 """
 /// Long long long, longedy long, más fada an lá tig an oíche, chaise longue, caffè lungo, ich bin
-// so lang nicht bei dir gewest
+/// so lang nicht bei dir gewest
 package com.example;
 """;
     doFormatTest(input, expected);
