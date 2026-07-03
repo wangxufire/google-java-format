@@ -2066,14 +2066,13 @@ class Test {}
         /// hello again
         class Test {}\
         """;
-    // TODO(b/530531076): Restore the indentation of `private String s;`
     String expected =
         """
         /// hello world
         ///
         /// {@snippet :
         /// public class Foo {
-        /// private String s;
+        ///   private String s;
         /// }
         /// }
         ///

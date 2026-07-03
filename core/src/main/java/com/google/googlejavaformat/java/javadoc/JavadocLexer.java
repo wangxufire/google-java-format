@@ -640,14 +640,20 @@ final class JavadocLexer {
   }
 
   /*
-   * This also eats any trailing whitespace. We would be smart enough to ignore that, anyway --
-   * except in the case of <pre>/<table>, inside which we otherwise leave whitespace intact.
+   * This also eats any trailing whitespace before the newline. We would be smart enough to ignore
+   * that, anyway -- except in the case of <pre>/<table>, inside which we otherwise leave whitespace
+   * intact.
    *
    * We'd remove the trailing whitespace later on (in JavaCommentsHelper.rewrite), but I feel safer
    * stripping it now: It otherwise might confuse our line-length count, which we use for wrapping.
    */
   private static final Pattern CLASSIC_NEWLINE_PATTERN = compile("[ \t]*\n[ \t]*[*]?[ \t]?");
-  private static final Pattern MARKDOWN_NEWLINE_PATTERN = compile("[ \t]*\n[ \t]*");
+  /*
+   * With Traditional comments, the initial space and leading `*` characters (if any) are still
+   * present in the input, but with Markdown comments, the leading `///` characters and shared
+   * initial whitespace have been removed at the point where this pattern is applied.
+   */
+  private static final Pattern MARKDOWN_NEWLINE_PATTERN = compile("[ \t]*\n");
 
   // We ensure elsewhere that we match this only at the beginning of a line.
   // Only match tags that start with a lowercase letter, to avoid false matches on unescaped
