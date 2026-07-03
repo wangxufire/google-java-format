@@ -1729,6 +1729,7 @@ class Test {}
 /// -  ```
 ///    code block
 ///    in a list
+///        with an indented line
 ///    ```
 ///
 /// - flibbertigibbet
@@ -1763,6 +1764,7 @@ class Test {}
 /// - ```
 ///   code block
 ///   in a list
+///       with an indented line
 ///   ```
 ///
 /// - flibbertigibbet
@@ -2048,6 +2050,79 @@ class Test {}
     } catch (FormatterException e) {
       throw new AssertionError(e);
     }
+  }
+
+  @Test
+  public void markdownBlankLinesAroundSnippetAndNoMangling() {
+    assume().that(MARKDOWN_JAVADOC_SUPPORTED).isTrue();
+    String input =
+        """
+        /// hello world
+        /// {@snippet :
+        /// public class Foo {
+        ///   private String s;
+        /// }
+        /// }
+        /// hello again
+        class Test {}\
+        """;
+    // TODO(b/530531076): Restore the indentation of `private String s;`
+    String expected =
+        """
+        /// hello world
+        ///
+        /// {@snippet :
+        /// public class Foo {
+        /// private String s;
+        /// }
+        /// }
+        ///
+        /// hello again
+        class Test {}
+        """;
+    doFormatTest(input, expected);
+  }
+
+  @Test
+  public void markdownLongCommentOnEnumConstant() {
+    assume().that(MARKDOWN_JAVADOC_SUPPORTED).isTrue();
+    String input =
+"""
+enum Foo {
+  /// Long long long, longedy long, más fada an lá tig an oíche, chaise longue, caffè lungo, ich bin so lang nicht bei dir gewest
+  BAR,
+}
+""";
+    // TODO(b/530532338): The wrapped line should have /// not //
+    String expected =
+"""
+enum Foo {
+  /// Long long long, longedy long, más fada an lá tig an oíche, chaise longue, caffè lungo, ich bin
+  // so lang nicht bei dir gewest
+  BAR,
+}
+""";
+    doFormatTest(input, expected);
+  }
+
+  @Test
+  public void markdownLongCommentOnPackageDeclaration() {
+    assume().that(MARKDOWN_JAVADOC_SUPPORTED).isTrue();
+    // A package doc comment is only really valid in package-info.java, but let's assume this is one
+    // of those.
+    String input =
+"""
+/// Long long long, longedy long, más fada an lá tig an oíche, chaise longue, caffè lungo, ich bin so lang nicht bei dir gewest
+package com.example;
+""";
+    // TODO(b/530532338): The wrapped line should have /// not //
+    String expected =
+"""
+/// Long long long, longedy long, más fada an lá tig an oíche, chaise longue, caffè lungo, ich bin
+// so lang nicht bei dir gewest
+package com.example;
+""";
+    doFormatTest(input, expected);
   }
 
   // TODO: b/346668798 - Test the following Markdown constructs, and make the tests work as needed.
