@@ -15,7 +15,9 @@ package com.google.googlejavaformat.java.javadoc;
 
 import static com.google.common.collect.ImmutableListMultimap.flatteningToImmutableListMultimap;
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertThrows;
 
+import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.googlejavaformat.java.javadoc.Token.HeaderCloseTag;
 import com.google.googlejavaformat.java.javadoc.Token.HeaderOpenTag;
@@ -63,6 +65,19 @@ public final class MarkdownPositionsTest {
             .put(end, new ListCloseTag(""))
             .build();
     assertThat(map).isEqualTo(expected);
+  }
+
+  // TODO: b/346668798 - This should not throw an exception.
+  // CommonMark allows ')' as an ordered list marker (e.g. '1) foo'), but MarkdownPositions
+  // only expects '.' in LIST_ITEM_START_PATTERN, throwing a VerifyException.
+  @Test
+  public void listWithParenthesis() {
+    String text =
+"""
+1) foo
+2) bar
+""";
+    assertThrows(VerifyException.class, () -> MarkdownPositions.parse(text));
   }
 
   @Test
