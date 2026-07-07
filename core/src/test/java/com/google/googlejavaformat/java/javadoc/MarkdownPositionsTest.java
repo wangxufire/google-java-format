@@ -15,9 +15,7 @@ package com.google.googlejavaformat.java.javadoc;
 
 import static com.google.common.collect.ImmutableListMultimap.flatteningToImmutableListMultimap;
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
 
-import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.googlejavaformat.java.javadoc.Token.HeaderCloseTag;
 import com.google.googlejavaformat.java.javadoc.Token.HeaderOpenTag;
@@ -67,9 +65,6 @@ public final class MarkdownPositionsTest {
     assertThat(map).isEqualTo(expected);
   }
 
-  // TODO: b/346668798 - This should not throw an exception.
-  // CommonMark allows ')' as an ordered list marker (e.g. '1) foo'), but MarkdownPositions
-  // only expects '.' in LIST_ITEM_START_PATTERN, throwing a VerifyException.
   @Test
   public void listWithParenthesis() {
     String text =
@@ -77,7 +72,45 @@ public final class MarkdownPositionsTest {
 1) foo
 2) bar
 """;
-    assertThrows(VerifyException.class, () -> MarkdownPositions.parse(text));
+    var positions = MarkdownPositions.parse(text);
+    ImmutableListMultimap<Integer, Token> map = positionToToken(positions, text);
+    int firstItem = text.indexOf('1');
+    int secondItem = text.indexOf('2');
+    int end = text.length() - 1;
+    ImmutableListMultimap<Integer, Token> expected =
+        ImmutableListMultimap.<Integer, Token>builder()
+            .put(firstItem, new ListOpenTag(""))
+            .put(firstItem, new ListItemOpenTag("1) "))
+            .put(secondItem - 1, new ListItemCloseTag(""))
+            .put(secondItem, new ListItemOpenTag("2) "))
+            .put(end, new ListItemCloseTag(""))
+            .put(end, new ListCloseTag(""))
+            .build();
+    assertThat(map).isEqualTo(expected);
+  }
+
+  @Test
+  public void listWithPlus() {
+    String text =
+"""
++ foo
++ bar
+""";
+    var positions = MarkdownPositions.parse(text);
+    ImmutableListMultimap<Integer, Token> map = positionToToken(positions, text);
+    int firstItem = text.indexOf('+');
+    int secondItem = text.lastIndexOf('+');
+    int end = text.length() - 1;
+    ImmutableListMultimap<Integer, Token> expected =
+        ImmutableListMultimap.<Integer, Token>builder()
+            .put(firstItem, new ListOpenTag(""))
+            .put(firstItem, new ListItemOpenTag("+ "))
+            .put(secondItem - 1, new ListItemCloseTag(""))
+            .put(secondItem, new ListItemOpenTag("+ "))
+            .put(end, new ListItemCloseTag(""))
+            .put(end, new ListCloseTag(""))
+            .build();
+    assertThat(map).isEqualTo(expected);
   }
 
   @Test

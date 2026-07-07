@@ -18,9 +18,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.Assert.assertThrows;
 
-import com.google.common.base.VerifyException;
 import com.google.common.io.ByteStreams;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -2124,19 +2122,32 @@ package com.example;
     doFormatTest(input, expected);
   }
 
-  // TODO: b/346668798 - This should not throw an exception.
-  // CommonMark allows ')' as an ordered list marker (e.g. '1) foo'), but MarkdownPositions
-  // only expects '.' in LIST_ITEM_START_PATTERN, throwing a VerifyException.
   @Test
   public void markdownOrderedListWithParenthesis() {
     assume().that(MARKDOWN_JAVADOC_SUPPORTED).isTrue();
     String input =
         """
+        /// Summary paragraph.
         /// 1) first item
         /// 2) second item
         class Test {}
         """;
-    assertThrows(VerifyException.class, () -> formatter.formatSource(input));
+    String expected = input;
+    doFormatTest(input, expected);
+  }
+
+  @Test
+  public void markdownBulletListWithPlus() {
+    assume().that(MARKDOWN_JAVADOC_SUPPORTED).isTrue();
+    String input =
+        """
+        /// Summary paragraph.
+        /// + first item
+        /// + second item
+        class Test {}
+        """;
+    String expected = input;
+    doFormatTest(input, expected);
   }
 
   // TODO: b/346668798 - Test the following Markdown constructs, and make the tests work as needed.

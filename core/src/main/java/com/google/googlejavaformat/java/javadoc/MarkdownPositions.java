@@ -258,5 +258,5 @@ final class MarkdownPositions {
   // The leading \s here works around what appears to be a CommonMark bug. We shouldn't ever see
   // space at the purported start of a list item?
   private static final Pattern LIST_ITEM_START_PATTERN =
-      Pattern.compile("(?:\\s*)((-|\\*|[0-9]+\\.)\\s)");
+      Pattern.compile("(?:\\s*)(([-+*]|[0-9]+[.)])\\s)");
 }
