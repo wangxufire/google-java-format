@@ -260,7 +260,9 @@ final class JavadocWriter {
   }
 
   void writeBlockquoteOpenOrClose(Token token) {
-    requestBlankLine();
+    if (wroteAnythingSignificant) {
+      requestBlankLine();
+    }
 
     writeToken(token);
 
@@ -268,7 +270,9 @@ final class JavadocWriter {
   }
 
   void writePreOpen(PreOpenTag token) {
-    requestBlankLine();
+    if (wroteAnythingSignificant) {
+      requestBlankLine();
+    }
 
     writeToken(token);
   }
@@ -288,7 +292,9 @@ final class JavadocWriter {
   }
 
   void writeTableOpen(TableOpenTag token) {
-    requestBlankLine();
+    if (wroteAnythingSignificant) {
+      requestBlankLine();
+    }
 
     writeToken(token);
   }

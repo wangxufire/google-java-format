@@ -2160,14 +2160,100 @@ package com.example;
         /// </table>
         class Test {}
         """;
-    // TODO(kak): we shouldn't spew out these 2 leading blank lines
+    String expected = input;
+    doFormatTest(input, expected);
+  }
+
+  @Test
+  public void blockquoteAtStartOfComment() {
+    assume().that(MARKDOWN_JAVADOC_SUPPORTED).isTrue();
+    String input =
+        """
+        /// <blockquote>
+        /// line 1
+        /// line 2
+        /// </blockquote>
+        class Test {}
+        """;
     String expected =
         """
+        /// <blockquote>
         ///
+        /// line 1 line 2
         ///
+        /// </blockquote>
+        class Test {}
+        """;
+    doFormatTest(input, expected);
+  }
+
+  @Test
+  public void preAtStartOfComment() {
+    assume().that(MARKDOWN_JAVADOC_SUPPORTED).isTrue();
+    String input =
+        """
+        /// <pre>
+        /// line 1
+        /// line 2
+        /// </pre>
+        class Test {}
+        """;
+    String expected = input;
+    doFormatTest(input, expected);
+  }
+
+  @Test
+  public void tableInHtmlListItem() {
+    assume().that(MARKDOWN_JAVADOC_SUPPORTED).isTrue();
+    String input =
+        """
+        /// <ul>
+        /// <li>
         /// <table>
         /// <tr><td>Foo</td></tr>
         /// </table>
+        /// </li>
+        /// </ul>
+        class Test {}
+        """;
+    // requestBlankLine() in writeTableOpen() inserts a blank line after <li> before <table> when
+    // inside a list item.
+    String expected =
+        """
+        /// <ul>
+        ///   <li>
+        ///
+        ///       <table>
+        /// <tr><td>Foo</td></tr>
+        /// </table>
+        ///
+        /// </ul>
+        class Test {}
+        """;
+    doFormatTest(input, expected);
+  }
+
+  @Test
+  public void tableInsideMarkdownListItemAfterText() {
+    assume().that(MARKDOWN_JAVADOC_SUPPORTED).isTrue();
+    String input =
+        """
+        /// - item text
+        ///   <table>
+        ///   <tr><td>Foo</td></tr>
+        ///   </table>
+        class Test {}
+        """;
+    // requestBlankLine() in writeTableOpen() inserts a blank line after item text before <table>
+    // inside the list item.
+    String expected =
+        """
+        ///
+        /// - item text
+        ///
+        ///   <table>
+        ///   <tr><td>Foo</td></tr>
+        ///   </table>
         class Test {}
         """;
     doFormatTest(input, expected);
