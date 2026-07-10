@@ -255,6 +255,32 @@ public final class JavadocFormattingTest {
   }
 
   @Test
+  public void moeCommentAtStartOfDoc() {
+    String input =
+        """
+        /**
+         * <!-- moe:begin_intracomment_strip -->
+         * Foo.
+         * <!-- moe:end_intracomment_strip -->
+         */
+        class Test {}\
+        """
+            .replace("moe", "MOE");
+    String expected =
+        """
+        /**
+         *
+         * <!-- moe:begin_intracomment_strip -->
+         * Foo.
+         * <!-- moe:end_intracomment_strip -->
+         */
+        class Test {}
+        """
+            .replace("moe", "MOE");
+    doFormatTest(input, expected);
+  }
+
+  @Test
   public void tableMostlyUntouched() {
     String input =
         """
