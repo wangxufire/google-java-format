@@ -284,7 +284,6 @@ public final class JavadocFormattingTest {
     String expected =
         """
         /**
-         *
          * <!-- moe:begin_intracomment_strip -->
          * Foo.
          * <!-- moe:end_intracomment_strip -->
@@ -1995,11 +1994,9 @@ class Test {}
         /// - item 2
         class Test {}
         """;
-    // TODO: the line break between items should be preserved, and there should not be a blank line
-    //   before the list.
+    // TODO: the line break between items should be preserved.
     String expected =
         """
-        ///
         /// - item 1
         /// - item 2
         class Test {}
@@ -2259,7 +2256,8 @@ package com.example;
         class Test {}
         """;
     // requestBlankLine() in writeTableOpen() inserts a blank line after <li> before <table> when
-    // inside a list item.
+    // inside a list item. Also, we might prefer to eliminate the blank lines around the table
+    // element and to indent the table contents and close tag at least as far as the open tag.
     String expected =
         """
         /// <ul>
@@ -2286,11 +2284,8 @@ package com.example;
         ///   </table>
         class Test {}
         """;
-    // requestBlankLine() in writeTableOpen() inserts a blank line after item text before <table>
-    // inside the list item.
     String expected =
         """
-        ///
         /// - item text
         ///
         ///   <table>

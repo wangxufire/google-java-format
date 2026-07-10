@@ -145,9 +145,7 @@ final class JavadocWriter {
      */
     postWriteModifiedContinuingListStack.reset();
 
-    if (!wroteAnythingSignificant) {
-      // Javadoc consists solely of tags. This is frowned upon in general but OK for @Overrides.
-    } else if (!continuingFooterTag) {
+    if (!continuingFooterTag) {
       // First footer tag after a body tag.
       requestBlankLine();
     } else {
@@ -234,9 +232,7 @@ final class JavadocWriter {
   }
 
   void writeHeaderOpen(HeaderOpenTag token) {
-    if (wroteAnythingSignificant) {
-      requestBlankLine();
-    }
+    requestBlankLine();
 
     writeToken(token);
   }
@@ -262,9 +258,7 @@ final class JavadocWriter {
   }
 
   void writeBlockquoteOpen(BlockquoteOpenTag token) {
-    if (wroteAnythingSignificant) {
-      requestBlankLine();
-    }
+    requestBlankLine();
 
     writeToken(token);
 
@@ -272,9 +266,7 @@ final class JavadocWriter {
   }
 
   void writeBlockquoteClose(BlockquoteCloseTag token) {
-    if (wroteAnythingSignificant) {
-      requestNewline();
-    }
+    requestNewline();
 
     writeToken(token);
 
@@ -282,9 +274,7 @@ final class JavadocWriter {
   }
 
   void writePreOpen(PreOpenTag token) {
-    if (wroteAnythingSignificant) {
-      requestBlankLine();
-    }
+    requestBlankLine();
 
     writeToken(token);
   }
@@ -304,9 +294,7 @@ final class JavadocWriter {
   }
 
   void writeTableOpen(TableOpenTag token) {
-    if (wroteAnythingSignificant) {
-      requestBlankLine();
-    }
+    requestBlankLine();
 
     writeToken(token);
   }
@@ -355,7 +343,7 @@ final class JavadocWriter {
   }
 
   void writeMarkdownFencedCodeBlock(MarkdownFencedCodeBlock token) {
-    if (wroteAnythingSignificant && !atStartOfLine) {
+    if (!atStartOfLine) {
       // A reminder that atStartOfLine is still true after `-␣` because it is a StartOfLineToken.
       requestBlankLine();
     }
@@ -371,11 +359,12 @@ final class JavadocWriter {
             });
     writeNewline();
     output.append(token.end());
+    wroteAnythingSignificant = true;
     requestBlankLine();
   }
 
   void writeMarkdownTable(MarkdownTable token) {
-    if (wroteAnythingSignificant && !atStartOfLine) {
+    if (!atStartOfLine) {
       requestBlankLine();
     }
     flushWhitespace();
@@ -385,6 +374,7 @@ final class JavadocWriter {
       writeNewline(AutoIndent.NO_AUTO_INDENT);
       output.append(line);
     }
+    wroteAnythingSignificant = true;
     requestBlankLine();
   }
 
@@ -417,6 +407,10 @@ final class JavadocWriter {
   private void flushWhitespace() {
     if (requestedMoeBeginStripComment != null) {
       requestNewline();
+    }
+
+    if (!wroteAnythingSignificant) {
+      requestedWhitespace = NONE;
     }
 
     if (classicJavadoc
@@ -466,6 +460,7 @@ final class JavadocWriter {
       output.append(requestedMoeBeginStripComment.value());
       requestedMoeBeginStripComment = null;
       indentForMoeEndStripComment = innerIndent();
+      wroteAnythingSignificant = true;
       requestNewline();
       writeToken(token);
       return;
