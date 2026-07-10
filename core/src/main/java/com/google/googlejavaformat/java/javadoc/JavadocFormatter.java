@@ -119,8 +119,8 @@ public final class JavadocFormatter {
         case HeaderOpenTag t -> output.writeHeaderOpen(t);
         case HeaderCloseTag t -> output.writeHeaderClose(t);
         case ParagraphOpenTag t -> output.writeParagraphOpen(standardizePToken(t));
-        case BlockquoteOpenTag t -> output.writeBlockquoteOpenOrClose(t);
-        case BlockquoteCloseTag t -> output.writeBlockquoteOpenOrClose(t);
+        case BlockquoteOpenTag t -> output.writeBlockquoteOpen(t);
+        case BlockquoteCloseTag t -> output.writeBlockquoteClose(t);
         case PreOpenTag t -> output.writePreOpen(t);
         case PreCloseTag t -> output.writePreClose(t);
         case CodeOpenTag t -> output.writeCodeOpen(t);

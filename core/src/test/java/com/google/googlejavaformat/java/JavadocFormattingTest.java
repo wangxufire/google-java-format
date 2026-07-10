@@ -716,7 +716,6 @@ public final class JavadocFormattingTest {
          * <blockquote>
          *
          * <p>def
-         *
          * </blockquote>
          *
          * ghi
@@ -2178,9 +2177,7 @@ package com.example;
     String expected =
         """
         /// <blockquote>
-        ///
         /// line 1 line 2
-        ///
         /// </blockquote>
         class Test {}
         """;
