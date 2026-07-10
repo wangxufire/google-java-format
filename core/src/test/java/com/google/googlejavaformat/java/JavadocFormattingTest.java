@@ -2150,6 +2150,29 @@ package com.example;
     doFormatTest(input, expected);
   }
 
+  @Test
+  public void tableAtStartOfComment() {
+    assume().that(MARKDOWN_JAVADOC_SUPPORTED).isTrue();
+    String input =
+        """
+        /// <table>
+        /// <tr><td>Foo</td></tr>
+        /// </table>
+        class Test {}
+        """;
+    // TODO(kak): we shouldn't spew out these 2 leading blank lines
+    String expected =
+        """
+        ///
+        ///
+        /// <table>
+        /// <tr><td>Foo</td></tr>
+        /// </table>
+        class Test {}
+        """;
+    doFormatTest(input, expected);
+  }
+
   // TODO: b/346668798 - Test the following Markdown constructs, and make the tests work as needed.
   // We can assume that the CommonMark parser correctly handles Markdown, so the question is whether
   // they are subsequently mishandled by our formatting logic. So for example the CommonMark parser
