@@ -31,6 +31,21 @@ public final class JavadocFormattingTest {
 
   private final Formatter formatter = new Formatter();
 
+  /**
+   * Tests that the formatter formats the given input string to the given expected string. Also
+   * tests that the formatter is idempotent when formatting an already formatted string.
+   */
+  private void doFormatTest(String input, String expected) {
+    try {
+      String actual = formatter.formatSource(input);
+      assertThat(actual).isEqualTo(expected);
+      String reformatted = formatter.formatSource(actual);
+      assertWithMessage("When checking idempotency").that(reformatted).isEqualTo(actual);
+    } catch (FormatterException e) {
+      throw new AssertionError(e);
+    }
+  }
+
   @Test
   public void notJavadoc() {
     String input =
@@ -1740,6 +1755,21 @@ class Test {}
   }
 
   @Test
+  public void markdownEmptyListItem() {
+    assume().that(MARKDOWN_JAVADOC_SUPPORTED).isTrue();
+    String input =
+"""
+/// A list with an empty item:
+/// - `foo`: enabled by default
+/// - `bar`: disabled by default
+/// -
+class Test {}
+""";
+    String expected = input;
+    doFormatTest(input, expected);
+  }
+
+  @Test
   public void markdownFencedCodeBlocks() {
     assume().that(MARKDOWN_JAVADOC_SUPPORTED).isTrue();
     // If fenced code blocks are not supported correctly, the contents of each one will be joined.
@@ -2064,17 +2094,6 @@ class Test {}
     // We don't currently try to align the column markers in the rows of the last table.
     String expected = input;
     doFormatTest(input, expected);
-  }
-
-  private void doFormatTest(String input, String expected) {
-    try {
-      String actual = formatter.formatSource(input);
-      assertThat(actual).isEqualTo(expected);
-      String reformatted = formatter.formatSource(actual);
-      assertWithMessage("When checking idempotency").that(reformatted).isEqualTo(actual);
-    } catch (FormatterException e) {
-      throw new AssertionError(e);
-    }
   }
 
   @Test
