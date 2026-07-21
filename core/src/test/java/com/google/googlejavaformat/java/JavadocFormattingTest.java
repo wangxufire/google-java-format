@@ -2005,6 +2005,32 @@ class Test {}
   }
 
   @Test
+  public void markdownListPrecedingBlankLine() {
+    assume().that(MARKDOWN_JAVADOC_SUPPORTED).isTrue();
+    String input =
+        """
+        /// Title.
+        ///
+        /// Some paragraph.
+        ///
+        /// - Item 1.
+        /// - Item 2.
+        class Test {}
+        """;
+    // TODO(b/534219145): The blank line before the list should be preserved.
+    String expected =
+        """
+        /// Title.
+        ///
+        /// Some paragraph.
+        /// - Item 1.
+        /// - Item 2.
+        class Test {}
+        """;
+    doFormatTest(input, expected);
+  }
+
+  @Test
   public void markdownBlockQuotes() {
     assume().that(MARKDOWN_JAVADOC_SUPPORTED).isTrue();
     String input =
